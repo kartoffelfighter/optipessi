@@ -2,15 +2,13 @@ bool runOptimist = false;        // this bool is set by optimist isr to run opti
 bool runPessimist = false;         // this bool is set by pessimist isr to run pessimist code
 
 bool firstrun = false;
-int counterOpt = 0;       // counter for runtimes of subroutine optimist
-int counterPes = 0;       // counter for runtimes of subroutine pessimist
-
-int sleepAfter = 200;       // sleep after x Seconds
 
 uint32_t counter1, counter2, counter3;
-int i = 0;
+uint16_t i = 0;
 
-bool active = 0;
+bool activeP = 0;
+bool activeO = 0;
 
 
-int stayActive = 30000;
+uint32_t stayActive = 30000;  // stay active after triggering ISR
+//uint32_t lightShow = 5*60*1000; // start light show after inactivity (mSecs)

@@ -4,9 +4,6 @@
 #include "pins.h" // header with pin information
 #include "functions.h"
 
-#define ledPin 13
-
-
 void setup()
 {
 
@@ -26,54 +23,74 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(optimist), optimistISR, FALLING);   // optimistISR => runOptimist = true
   attachInterrupt(digitalPinToInterrupt(pessimist), pessimistISR, FALLING); // pessimistISR => runPessimist = true
 
-  pinMode(ledPin, 0x1); // Ausgabe LED festlegen
+  pinMode(ledOpti, 0x1);
+  pinMode(ledPessi, 0x1);
 
+  digitalWrite(ledOpti, 0x1);
+  digitalWrite(ledOpti, 0x1);
   resetLight();
 }
 
 void loop()
 {
-  // mux1 attached:
-  // dac1 : voll weiß
-  // dac2 : voll grün
-  // dac3 : voll rot
+  if (Serial.available() >= 0)
+  {
 
-  // mux2 attached:
-  // dac1 : leer weiß
-  // dac2 : leer grün
-  // dac3 : leer rot
+    byte incomingByte = Serial.read();
 
-  // mux3 attached:
-  // dac1 : oben weiß
-  // dac2 : oben grün
-  // dac3 : oben rot
-
-  // mux4 attached:
-  // dac1 : oben blau
-  // dac2 : leer blau
-  // dac3 : voll rot (blau, RGB defekt)
+    switch (incomingByte)
+    {
+    case 'o': //  turn off
+      resetLight();
+      break;
+    case 'd': //  show all possible lights (pretty bright)
+      lightMeUp();
+      break;
+    case 'p': // run pessimist routine
+      pessimistISR();
+      break;
+    case 'q': // run optimist routine
+      optimistISR();
+      Serial.println("set optimist Serial");
+      break;
+    case 'e':
+      while (!runOptimist && !runPessimist)
+      {
+        Serial.println("party");
+        lightMeUp();
+        delay(100);
+        resetLight();
+        delay(100);
+      }
+      break;
+    }
+  }
 
   if (runPessimist)
   {
-    if(active && firstrun) {
-    resetLight();
-    firstrun = 0;
-    }
-    digitalWrite(mux3, 1);  // oben
-    digitalWrite(mux1, 0);  // voll resetten
-    digitalWrite(mux2, 1);  // leer
-    if(firstrun && !active) {
-    fadeUp(1);
-    firstrun = 0;
-    } 
-    
-    
+    Serial.println("running Pessimist");
     if (millis() - counter1 <= stayActive)
     {
-      active = 1;
-      Serial.println("Pessimist button pressed!");
-      analogWrite(dac1, 255);  
-      analogWrite(dac3, 255);
+      Serial.println("Pessimist time not over");
+      if (activeO or firstrun)
+      {
+        Serial.print("activeO:");
+        Serial.println(activeO);
+        Serial.print("firstrun:");
+        Serial.println(firstrun);
+        Serial.println("");
+        resetLight();
+        firstrun = 0;
+        digitalWrite(mux1, 0); // voll resetten
+        digitalWrite(mux2, 1); // leer
+        digitalWrite(mux3, 1); // oben
+        digitalWrite(mux4, 0); // disable blue mux
+        fadeUp(1);
+        activeP = 1;
+        activeO = 0;
+      }
+
+      analogWrite(dac1, 255);
     }
     else
     {
@@ -83,29 +100,31 @@ void loop()
     }
   }
 
-
-if (runOptimist)
+  if (runOptimist)
   {
-    if(active && firstrun) {
-      resetLight();
-      firstrun = 0;
-    }
-    digitalWrite(mux3, 1);  // oben
-    digitalWrite(mux2, 0);  // leer resetten
-    digitalWrite(mux1, 1);  // voll
-    if(firstrun && !active) {
-    fadeUp(1);
-    firstrun = 0;
-    }
-
-    
+    Serial.println("running Optimist");
     if (millis() - counter1 <= stayActive)
     {
-      active = 1;
-      Serial.println("Optimist button pressed!");
-      analogWrite(dac1, 255); 
-      analogWrite(dac2, 255);
+      Serial.println("optimist time not over");
+      if (activeP or firstrun)
+      {
+        Serial.print("activeP:");
+        Serial.println(activeP);
+        Serial.print("firstrun:");
+        Serial.println(firstrun);
+        Serial.println("");
+        resetLight();
+        firstrun = 0;
+        fadeUp(1);
+        activeP = 0;
+        activeO = 1;
+      }
 
+      digitalWrite(mux1, 1); // voll
+      digitalWrite(mux2, 0); // leer resetten
+      digitalWrite(mux3, 1); // oben
+      digitalWrite(mux4, 0); // disable blue mux
+      analogWrite(dac1, 255);
     }
     else
     {
@@ -114,4 +133,17 @@ if (runOptimist)
       resetLight();
     }
   }
+
+  /*
+if(millis() - counter1 + stayActive  <= lightShow) {
+      digitalWrite(mux3, 1);
+  if(!runPessimist && !runOptimist && !Serial.available()) {
+    //analogWrite(dac1, 255);
+    analogWrite(dac2, 255);
+    analogWrite(dac3, 255);
+  }
+  //resetLight();
+  counter2 = millis();
+  }
+  */
 }

@@ -19,3 +19,5 @@
 #define mux3 6
 #define mux4 7
 
+#define ledOpti 13
+#define ledPessi 12
