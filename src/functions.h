@@ -36,15 +36,12 @@ void fadeUp(int dac)
         {
         case 1:
             analogWrite(dac1, i);
-            delay(10);
             break;
         case 2:
             analogWrite(dac2, i);
-            delay(10);
             break;
         case 3:
             analogWrite(dac3, i);
-            delay(10);
             break;
         }
     }
@@ -59,15 +56,12 @@ void fadeDown(int dac)
         {
         case 1:
             analogWrite(dac1, (i * -1) + 255);
-            delay(10);
             break;
         case 2:
             analogWrite(dac2, (i * -1) + 255);
-            delay(10);
             break;
         case 3:
             analogWrite(dac3, (i * -1) + 255);
-            delay(10);
             break;
         }
     }
