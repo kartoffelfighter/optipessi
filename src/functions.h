@@ -23,6 +23,9 @@ void resetLight()
     analogWrite(dac1, 0);
     analogWrite(dac2, 0);
     analogWrite(dac3, 0);
+    
+    digitalWrite(ledOpti, 0x0);
+    digitalWrite(ledPessi, 0x0);
 }
 
 void fadeUp(int dac)
