@@ -11,4 +11,7 @@ bool activeO = 0;
 
 
 uint32_t stayActive = 30000;  // stay active after triggering ISR
-//uint32_t lightShow = 5*60*1000; // start light show after inactivity (mSecs)
+uint32_t lightShow =  5; // start light show after inactivity (Minutes)
+uint32_t lastRunning = 0;   // counter for last runtime
+uint32_t incomingSettings;      // incoming value from serial
+uint32_t delayWhileLightshow = 200;  
